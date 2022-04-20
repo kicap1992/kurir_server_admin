@@ -19,6 +19,14 @@ const handle = app.getRequestHandler()
 
 app.prepare().then(() => {
   const server = express()
+  const http = require('http')
+  const https = require('https')
+  const fs = require('fs')
+
+  const options = {
+    key: fs.readFileSync('./server/cert.key'),
+    cert: fs.readFileSync('./server/cert.crt')
+  }
 
   // middleware
   server.use(formData.parse());
@@ -31,7 +39,7 @@ app.prepare().then(() => {
   const login_router = require('./routes/login_router');
 
   // use routes
-  server.use('/login', login_router);
+  server.use('/api/login', login_router);
 
   // connect to mongodb
   mongoose.connect(process.env.DB_CONNECTION, { useNewUrlParser: true, useUnifiedTopology: true, family: 4})
@@ -42,18 +50,32 @@ app.prepare().then(() => {
   })
   
 
-  server.get('/api/shows', (req, res) => {
-    return res.end('Hello World')
+  server.get('/api', (req, res) => {
+    console.log("ada org request");
+    return res.status(200).send({ status : true, message : 'connected to api'})
   });
 
   server.all('*', (req, res) => {
     return handle(req, res)
   })
 
-  server.listen(port, (err) => {
-    if (err) throw err
+  // server.listen(port, (err) => {
+  //   if (err) throw err
 
+  //   // console.log(`ini dia ${process.env.DB_CONNECTION}`)
+  //   console.log(`> Ready on http://localhost:${port}`)
+  // })
+  http.createServer(server).listen(port, (err) => {
+      if (err) throw err
+  
+      // console.log(`ini dia ${process.env.DB_CONNECTION}`)
+      console.log(`> Ready on http://localhost:${port}`)
+    })
+
+  https.createServer (options, server).listen(3002, (err) => {
+    if (err) throw err
+  
     // console.log(`ini dia ${process.env.DB_CONNECTION}`)
-    console.log(`> Ready on http://localhost:${port}`)
+    console.log(`> Ready on https://localhost:${3002}`)
   })
 })

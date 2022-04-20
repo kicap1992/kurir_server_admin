@@ -34,3 +34,7 @@ yarn-error.log*
 
 # googlekey.json
 googlekey.json*
+
+# cert
+cert.crt
+cert.key
