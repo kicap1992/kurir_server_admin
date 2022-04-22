@@ -13,123 +13,70 @@ const kenderaan_kurir_folder_id = process.env.KENDERAAN_KURIR_FOLDER_ID;
 
 // crate get
 router.get('/', async (req, res) => {
-
-    // console.log(await googlenya.uploadFile('hehehehhe'))
-    res.send({ status: true, msg: 'sini dia' });
-})
-
-//create get for daftar
-router.post('/daftar', async (req, res) => {
+    console.log("ada request login");
+    // console the parameter from the url
+    // console.log(req.query);
 
 
     try {
-        // console.log(req)
-        role = req.body.role;
-        let responsenya;
-
-        if (role == 'pengirim') {
-            // console.log("ini untuk pengirim");
-            // cek if req.body.no_telp is exist on database return true or false
-            let isExist = await pengirimModel.findOne({ no_telp: req.body.no_telp });
-            if (isExist) {
-                res.status(400).send({ message: 'No Telpon Sudah Terdaftar' });
-                return;
-            }
-
-            // check if req.body.email is exist on database return true or false
-            let isExistEmail = await pengirimModel.findOne({ email: req.body.email });
-            if (isExistEmail) {
-                res.status(400).send({ message: 'Email Sudah Terdaftar' });
-                return;
-            }
-
-            let new_pengirim = new pengirimModel(req.body);
-            // add photo_url to pengirim
-            // check if files.photo exist
-            if (req.files.photo) {
-                let id_photo = await googlenya.uploadFile(new_pengirim._id + ".jpg", req.files.photo.path, pengirim_folder_id, "ini photo pengirim");
-                new_pengirim.photo_url = `https://drive.google.com/uc?export=view&id=${id_photo}`;
-            }
-
-            // console.log(new_pengirim);
-            // console.log(pengirim_folder_id)
-
-            await new_pengirim.save();
-            responsenya = new_pengirim;
-        } else if (role == 'kurir') {
-            // check if req.body.nik is exists
-            let isExist = await kurirModel.findOne({ nik: req.body.nik });
-            if (isExist) {
-                res.status(400).send({
-                    status: false,
-                    message: 'NIK Sudah Terdaftar'
-                });
-                return;
-            }
-
-            // check if req.body.no_telp is exists
-            let isExist2 = await kurirModel.findOne({ no_telp: req.body.no_telp });
-            if (isExist2) {
-                res.status(400).send({
-                    status: false,
-                    message: 'No Telpon Sudah Terdaftar'
-                });
-                return;
-            }
-
-            // check if req.body.email is exists
-            let isExist3 = await kurirModel.findOne({ email: req.body.email });
-            if (isExist3) {
-                res.status(400).send({
-                    status: false,
-                    message: 'Email Sudah Terdaftar'
-                });
-                return;
-            }
-
-            // check if req.files.photo and req.files.ktp_photo and req.files.ktp_holding_photo and req.files.kenderaan_photo exist
-            if (!req.files.photo || !req.files.ktp_photo || !req.files.ktp_holding_photo || !req.files.kenderaan_photo) {
-                res.status(400).send({
-                    status: false,
-                    message: 'File tidak boleh kosong'
-                });
-                return;
-            }
-
-            let new_kurir = new kurirModel(req.body);
-
-            // add photo_url to new_kurir            
-            let id_photo = googlenya.uploadFile(new_kurir._id + ".jpg", req.files.photo.path, kurir_folder_id, "ini photo kurir");
-
-
-
-            // add ktp_url to new_kurir
-            let id_ktp = googlenya.uploadFile("ktp_" + new_kurir._id + ".jpg", req.files.ktp_photo.path, ktp_kurir_folder_id, "ini ktp kurir");
-
-
-            // add ktp_holding_url to new_kurir
-            let id_ktp_holding = googlenya.uploadFile("ktp_holding_" + new_kurir._id + ".jpg", req.files.ktp_holding_photo.path, ktp_holding_kurir_folder_id, "ini ktp holding kurir");
-
-
-            // add kenderaan_url to kurir
-            let id_kenderaan = googlenya.uploadFile("kenderaan_" + new_kurir._id + ".jpg", req.files.kenderaan_photo.path, kenderaan_kurir_folder_id, "ini kenderaan kurir");
-
-            new_kurir.photo_url = `https://drive.google.com/uc?export=view&id=${await id_photo}`
-            new_kurir.ktp_url = `https://drive.google.com/uc?export=view&id=${await id_ktp}`
-            new_kurir.ktp_holding_url = `https://drive.google.com/uc?export=view&id=${await id_ktp_holding}`
-            new_kurir.kenderaan_url = `https://drive.google.com/uc?export=view&id=${await id_kenderaan}`
-
-            console.log(new_kurir)
-            await new_kurir.save();
-            responsenya = new_kurir;
+        let username = req.query.username;
+        let password = req.query.password;
+        let role = req.query.role;
+        // if username, password and role is empty or null
+        if (!username || !password || !role) {
+            res.status(400).send({
+                status: false,
+                message: 'username, password and role is required'
+            });
+            return;
         }
-        res.send({ status: true, data: responsenya });
+
+        // if role is not equal to 'pengirim' or 'kurir'
+        if (role !== 'pengirim' && role !== 'kurir') {
+            res.status(400).send({
+                status: false,
+                message: 'Role is wrong'
+            });
+            return;
+        }
+
+        // check from loginUserModel
+        let user = await loginUserModel.findOne({
+            username: username,
+            password: password,
+            role: role
+        });
+
+        // if user is not found
+        if (!user) {
+            res.status(400).send({
+                status :false,
+                message: 'Username dan Password Salah',
+                focus: 'username'
+            });
+            return;
+        }
+
+        console.log(user);
+
+        res.status(200).send({
+            status: true,
+            message: 'Login Success',
+            data: user
+        })
+
+
     } catch (error) {
-        res.status(500).send({ status: false, data: error });
+        console.log(error);
+        res.status(500).send({ status: false, message: error.message });
     }
 
-    // res.send('sini untuk daftar');
+    // console.log(await googlenya.uploadFile('hehehehhe'))
+    // res.send({ status: true, message: 'sini diaadasd' });
 })
+
+
+
 
 router.post('/daftar1', async (req, res) => {
     try {
@@ -143,8 +90,8 @@ router.post('/daftar1', async (req, res) => {
         }
         data = JSON.parse(data);
 
-        if(data.role == 'kurir'){
-            
+        if (data.role == 'kurir') {
+
             let isExist = await kurirModel.findOne({ nik: data.nik });
             // console.log(isExist.status + "ini adalag evaluasi");
             // console.log("ini untuk nik")
@@ -154,7 +101,7 @@ router.post('/daftar1', async (req, res) => {
                 res.status(400).send({
                     status: false,
                     message: message,
-                    focus : 'nik'
+                    focus: 'nik'
                 });
                 return;
             }
@@ -168,7 +115,7 @@ router.post('/daftar1', async (req, res) => {
                 res.status(400).send({
                     status: false,
                     message: message,
-                    focus : 'no_telp'
+                    focus: 'no_telp'
                 });
                 return;
             }
@@ -182,7 +129,7 @@ router.post('/daftar1', async (req, res) => {
                 res.status(400).send({
                     status: false,
                     message: message,
-                    focus : 'email'
+                    focus: 'email'
                 });
                 return;
             }
@@ -222,7 +169,7 @@ router.post('/daftar1', async (req, res) => {
             new_kurir.kenderaan_url = `https://drive.google.com/uc?export=view&id=${await id_kenderaan}`
 
             console.log(new_kurir)
-            
+
 
             let new_login = new loginUserModel(data);
 
@@ -233,9 +180,64 @@ router.post('/daftar1', async (req, res) => {
             await new_kurir.save();
             await new_login.save();
 
-            
+
 
             // responsenya = new_kurir;
+        } else if (data.role == 'pengirim') {
+            let isExist = await pengirimModel.findOne({ nik: data.no_telp });
+            // console.log(isExist.status + "ini adalag evaluasi");
+            // console.log("ini untuk no_telpon")
+            if (isExist) {
+                let message = (isExist.status == 'Evaluasi') ? 'No Telpon ini telah terdaftar sebelumnya dan sekarang dalam evaluasi tim kami.\n Jika anda pemilik no telpon ini, Tim kami akan mengirim ke email yang anda daftarkan sebelumnya untuk konfirmasi pendaftaran' : 'No Telpon Sudah Terdaftar dan sudah diaktifkan';
+                res.status(400).send({
+                    status: false,
+                    message: message,
+                    focus: 'no_telp'
+                });
+                return;
+            }
+
+            let isExist2 = await pengirimModel.findOne({ email: data.email });
+            // console.log(isExist2)
+            // console.log("ini untuk email")
+            if (isExist2) {
+                let message = (isExist2.status == 'Evaluasi') ? 'Email ini telah terdaftar sebelumnya dan sekarang dalam evaluasi tim kami.\nTim kami akan mengirim ke email ini yang anda daftarkan sebelumnya untuk konfirmasi pendaftaran' : 'Email Sudah Terdaftar dan sudah diaktifkan';
+                res.status(400).send({
+                    status: false,
+                    message: message,
+                    focus: 'email'
+                });
+                return;
+            }
+
+            // check if req.files.photo exist
+            if (!req.files.photo) {
+                res.status(400).send({
+                    status: false,
+                    message: 'File tidak boleh kosong'
+                });
+                return;
+            }
+
+            res.send({ status: true, message: 'Anda akan mendapat notifikasi di email anda dan juga no telpon jika admin menyetujui ataupun membatalkan pendaftaran anda' });
+
+            let new_pengirim = new pengirimModel(data);
+            // add photo_url to new_pengirim
+            let id_photo = googlenya.uploadFile(new_pengirim._id + ".jpg", req.files.photo.path, pengirim_folder_id, "ini photo pengirim");
+
+            new_pengirim.photo_url = `https://drive.google.com/uc?export=view&id=${await id_photo}`
+
+            console.log(new_pengirim)
+
+            let new_login = new loginUserModel(data);
+
+            // push new_pengirim._id to new_login._idnya
+            new_login._idnya = new_pengirim._id;
+            console.log(new_login);
+
+            await new_pengirim.save();
+            await new_login.save();
+
         }
 
 

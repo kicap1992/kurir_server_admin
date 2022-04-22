@@ -22,9 +22,14 @@ const pengirimSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  status: {
+    type: String,
+
+  },
   photo_url: {
     type: String,
-    // required: true
+    required: true,
+    default: 'Evaluasi'
   },
   created_at: {
     type: Date,
