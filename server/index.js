@@ -1,5 +1,6 @@
 const express = require('express')
 const next = require('next')
+require("dotenv").config();
 
 const mongoose = require('mongoose');
 const formData = require('express-form-data');
@@ -37,9 +38,15 @@ app.prepare().then(() => {
 
   // import routes
   const login_router = require('./routes/login_router');
+  const kurir_router = require('./routes/kurir_router');
+  const pengirim_router = require('./routes/pengirim_router');
+  const peta_router = require('./routes/peta_router');
 
   // use routes
   server.use('/api/login', login_router);
+  server.use('/api/kurir', kurir_router);
+  server.use('/api/pengirim', pengirim_router);
+  server.use('/api/peta', peta_router);
 
   // connect to mongodb
   mongoose.connect(process.env.DB_CONNECTION, { useNewUrlParser: true, useUnifiedTopology: true, family: 4})
@@ -53,6 +60,10 @@ app.prepare().then(() => {
   server.get('/api', (req, res) => {
     console.log("ada org request");
     return res.status(200).send({ status : true, message : 'connected to api'})
+  });
+
+  server.use('/api',(req, res, next) => {
+    res.status(404).send('404 not found');
   });
 
   server.all('*', (req, res) => {
@@ -72,10 +83,10 @@ app.prepare().then(() => {
       console.log(`> Ready on http://localhost:${port}`)
     })
 
-  https.createServer (options, server).listen(3002, (err) => {
+  https.createServer (options, server).listen(3003, (err) => {
     if (err) throw err
   
     // console.log(`ini dia ${process.env.DB_CONNECTION}`)
-    console.log(`> Ready on https://localhost:${3002}`)
+    console.log(`> Ready on https://localhost:${3003}`)
   })
 })
