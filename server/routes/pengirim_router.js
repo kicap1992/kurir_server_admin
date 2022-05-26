@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 
-const {pengirimModel, loginUserModel} = require('../models/users_model');
+const {pengirimModel, kurirModel, loginUserModel} = require('../models/users_model');
 
 
 let googlenya = require('../google/googleapi.js');
@@ -32,6 +32,18 @@ async function cek_user_pengirim(req, res, next) {
 router.get('/', cek_user_pengirim, async (req, res) => {
   console.log("sini router get pengirim");
   res.status(200).send({ message: 'connected to pengirim' })
+})
+
+// create '/pengirim' get route
+router.get('/kurir', cek_user_pengirim, async (req, res) => {
+  try {
+    const data = await kurirModel.find({
+      status: 'Aaaktif'
+    }).select('-email -created_at -updated_at -__v -ktp_url  -kenderaan_url -photo_url -_id -alamat');
+    res.status(200).send({data : data});
+  } catch (error) {
+    res.status(500).send({ message: 'Internal Server Error' });
+  }
 })
 
 module.exports = router;
