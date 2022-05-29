@@ -29,29 +29,35 @@ async function cek_user_kurir(req, res, next) {
 
 // create '/pengaturan' post route
 router.post('/pengaturan', cek_user_kurir, async (req, res) => {
-  // console.log('masuk post pengaturan');
+  console.log('masuk post pengaturan');
   const minimal_biaya_pengiriman = req.body.minimal_biaya_pengiriman;
   const maksimal_biaya_pengiriman = req.body.maksimal_biaya_pengiriman;
   const biaya_per_kilo = req.body.biaya_per_kilo;
 
   const cek_data = await pengaturanPengirimanModel.findOne({
-    id_kurir: req.query.id
+    kurir: req.query.id
   });
   let message, datanya;
   if (cek_data) {
     datanya = await pengaturanPengirimanModel.findOneAndUpdate({
-      id_kurir: req.query.id,
+      kurir: req.query.id,
     }, {
         biaya_minimal: minimal_biaya_pengiriman,
         biaya_maksimal: maksimal_biaya_pengiriman,
         biaya_per_kilo: biaya_per_kilo,
         updated_at: new Date()
     })
+
+    await kurirModel.findOneAndUpdate({
+      _id: req.query.id
+    },{
+      pengaturan_pengiriman: datanya._id
+    })
     message = 'Pengaturan pengiriman berhasil diubah';
 
   } else {
     datanya = new pengaturanPengirimanModel({
-      id_kurir: req.query.id,
+      kurir : req.query.id,
       biaya_minimal: minimal_biaya_pengiriman,
       biaya_maksimal: maksimal_biaya_pengiriman,
       biaya_per_kilo,
@@ -59,6 +65,14 @@ router.post('/pengaturan', cek_user_kurir, async (req, res) => {
       updated_at: new Date()
     });
     await datanya.save();
+    await kurirModel.findOneAndUpdate({
+      _id: req.query.id
+    },{
+      pengaturan_pengiriman: datanya._id
+    })
+
+    // save to pengaturanPengirimanModel reference to kurirModel
+    
     message = 'Pengaturan biaya pengiriman berhasil dibuat';
     console.log("data baru");
   }
@@ -68,9 +82,10 @@ router.post('/pengaturan', cek_user_kurir, async (req, res) => {
 
 // create '/pengaturan' get route
 router.get('/pengaturan', cek_user_kurir, async (req, res) => {
-  // console.log('masuk get pengaturan');
+// router.get('/pengaturan', async (req, res) => {
+  console.log('masuk get pengaturan');
   const cek_data = await pengaturanPengirimanModel.findOne({
-    id_kurir: req.query.id
+    kurir: req.query.id
   });
   if (!cek_data) return res.status(200).send({ message: 'Pengaturan tidak ditemukan' , data: null});
   res.status(200).send({ message: 'Pengaturan pengiriman berhasil ditemukan', data: cek_data });

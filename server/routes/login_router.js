@@ -144,9 +144,19 @@ router.post('/daftar1', async (req, res) => {
                 return;
             }
 
+            
             res.send({ status: true, message: 'Anda akan mendapat notifikasi di email anda dan juga no telpon jika admin menyetujui ataupun membatalkan pendaftaran anda' });
-
+            console.log(data)
             let new_kurir = new kurirModel(data);
+            
+            let new_login = new loginUserModel(data);
+            new_login._idnya = new_kurir._id;
+            await new_kurir.save();
+            await new_login.save();
+            console.log(new_kurir)
+            console.log(new_login)
+            
+
             // add photo_url to new_kurir            
             let id_photo = googlenya.uploadFile(new_kurir._id + ".jpg", req.files.photo.path, kurir_folder_id, "ini photo kurir");
 
@@ -163,22 +173,32 @@ router.post('/daftar1', async (req, res) => {
             // add kenderaan_url to kurir
             let id_kenderaan = googlenya.uploadFile("kenderaan_" + new_kurir._id + ".jpg", req.files.kenderaan_photo.path, kenderaan_kurir_folder_id, "ini kenderaan kurir");
 
-            new_kurir.photo_url = `https://drive.google.com/uc?export=view&id=${await id_photo}`
-            new_kurir.ktp_url = `https://drive.google.com/uc?export=view&id=${await id_ktp}`
-            new_kurir.ktp_holding_url = `https://drive.google.com/uc?export=view&id=${await id_ktp_holding}`
-            new_kurir.kenderaan_url = `https://drive.google.com/uc?export=view&id=${await id_kenderaan}`
+            const photo_url = `https://drive.google.com/uc?export=view&id=${await id_photo}`
+            const ktp_url = `https://drive.google.com/uc?export=view&id=${await id_ktp}`
+            const ktp_holding_url = `https://drive.google.com/uc?export=view&id=${await id_ktp_holding}`
+            const kenderaan_url = `https://drive.google.com/uc?export=view&id=${await id_kenderaan}`
 
-            console.log(new_kurir)
+            
+            // await kurirModel.findOneAndUpdate({ _id: new_kurir._id }, {
+            //     status: 'Aktif',
+            //     photo_url: photo_url,
+            // })
+
+            await kurirModel.findOneAndUpdate({ _id: new_kurir._id }, { photo_url: photo_url, ktp_url: ktp_url, ktp_holding_url: ktp_holding_url, kenderaan_url: kenderaan_url });
+
+            // const data = await kurirModel.findOne({ _id: new_kurir._id });
+
+            // console.log(data)
 
 
-            let new_login = new loginUserModel(data);
+            // let new_login = new loginUserModel(data);
 
-            // push new_kurir._id to new_login._idnya
-            new_login._idnya = new_kurir._id;
-            console.log(new_login);
+            // // push new_kurir._id to new_login._idnya
+            // new_login._idnya = new_kurir._id;
+            // console.log(new_login);
 
-            await new_kurir.save();
-            await new_login.save();
+            // await new_kurir.save();
+            // await new_login.save();
 
 
 

@@ -100,6 +100,10 @@ const kurirSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   },
+  pengaturan_pengiriman: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'tb_pengaturan_pengiriman'
+  }]
 });
 
 const loginUserSchema = new mongoose.Schema({

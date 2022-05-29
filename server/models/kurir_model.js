@@ -1,10 +1,6 @@
 const mongoose = require('mongoose');
 
 const pengaturanPengirimanSchema = new mongoose.Schema({
-  id_kurir: {
-    type: mongoose.Schema.Types.ObjectId,
-    required: true,
-  },
   biaya_minimal: {
     type: Number,
     required: true,
@@ -24,7 +20,11 @@ const pengaturanPengirimanSchema = new mongoose.Schema({
   updated_at: {
     type: Date,
     default: Date.now
-  }
+  },
+  kurir:[{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'tb_kurir'
+  }]
 })
 
 const pengaturanPengirimanModel = mongoose.model('tb_pengaturan_pengiriman', pengaturanPengirimanSchema , 'tb_pengaturan_pengiriman');
