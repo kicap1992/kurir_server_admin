@@ -49,20 +49,26 @@ app.prepare().then(() => {
   server.use('/api/peta', peta_router);
 
   // connect to mongodb
-  mongoose.connect(process.env.DB_CONNECTION, { useNewUrlParser: true, useUnifiedTopology: true, family: 4})
+  mongoose.connect(process.env.DB_CONNECTION, { useNewUrlParser: true, useUnifiedTopology: true, family: 4 })
   let db = mongoose.connection;
   db.on('error', console.error.bind(console, 'connection error:'));
-  db.once('open', function() {
+  db.once('open', function () {
     console.log('connected to mongodb');
   })
-  
+
+
+  const io = require("socket.io-client");
+  const socket = io("http://localhost:3001/");
 
   server.get('/api', (req, res) => {
     console.log("ada org request");
-    return res.status(200).send({ status : true, message : 'connected to api'})
+    socket.emit('coba2', {
+      data: 'coba2'
+    })
+    return res.status(200).send({ status: true, message: 'connected to api' })
   });
 
-  server.use('/api',(req, res, next) => {
+  server.use('/api', (req, res, next) => {
     res.status(404).send('404 not found');
   });
 
@@ -76,16 +82,38 @@ app.prepare().then(() => {
   //   // console.log(`ini dia ${process.env.DB_CONNECTION}`)
   //   console.log(`> Ready on http://localhost:${port}`)
   // })
-  http.createServer(server).listen(port, (err) => {
-      if (err) throw err
-  
-      // console.log(`ini dia ${process.env.DB_CONNECTION}`)
-      console.log(`> Ready on http://localhost:${port}`)
-    })
+  const _server = http.createServer(server);
+  const _server_https = https.createServer(options, server);
 
-  https.createServer (options, server).listen(3003, (err) => {
+  const { Server } = require("socket.io");
+  const io1 = new Server(_server);
+  const io2 = new Server(_server_https);
+
+  io1.on('connection', (socket) => {
+    console.log('socket connected');
+    socket.on('coba2', (_) => {
+      console.log(_.toString() +" ini di dia");
+      io1.emit('coba1', {
+        data: 'coba2'
+      })
+      
+    });
+  })
+
+  // io2.on('connection', (socket) => {
+  //   console.log('socket connected');
+  // })
+
+  _server.listen(port, (err) => {
     if (err) throw err
-  
+
+    // console.log(`ini dia ${process.env.DB_CONNECTION}`)
+    console.log(`> Ready on http://localhost:${port}`)
+  })
+
+  _server_https.listen(3003, (err) => {
+    if (err) throw err
+
     // console.log(`ini dia ${process.env.DB_CONNECTION}`)
     console.log(`> Ready on https://localhost:${3003}`)
   })

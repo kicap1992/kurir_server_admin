@@ -38,7 +38,11 @@ const pengirimSchema = new mongoose.Schema({
   updated_at: {
     type: Date,
     default: Date.now
-  }
+  },
+  pengiriman_barang  : [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'tb_pengiriman_barang'
+  }]
 });
 
 const kurirSchema = new mongoose.Schema({
@@ -103,6 +107,10 @@ const kurirSchema = new mongoose.Schema({
   pengaturan_pengiriman: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'tb_pengaturan_pengiriman'
+  }],
+  pengiriman_barang: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'tb_pengiriman_barang'
   }]
 });
 

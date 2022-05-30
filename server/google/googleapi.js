@@ -57,6 +57,7 @@ module.exports = {
       console.log(message)
       return response.data.id;
     } catch (error) {
+      console.log(error)
       console.log('ini error')
       return error;
     }
