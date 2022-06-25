@@ -92,12 +92,22 @@ app.prepare().then(() => {
   io1.on('connection', (socket) => {
     console.log('socket connected');
     socket.on('coba2', (_) => {
-      console.log(_.toString() +" ini di dia");
-      io1.emit('coba1', {
-        data: 'coba2'
+      console.log(_ , " ini di dia coba2");
+      io1.emit('percobaan1', {
+        data: 'percobaan1',
+        message:"ini terkirim ke user"
       })
       
     });
+
+    socket.on('pengiriman_create', (_) => {
+      console.log(_ ," ini dia pengiriman_create");
+      
+      io1.emit('pengiriman_create'+_.id_pengirim, {
+        message: 'Pengiriman Baru Untuk Anda',
+        id_pengiriman : _.id_pengiriman,
+      })
+    })
   })
 
   // io2.on('connection', (socket) => {

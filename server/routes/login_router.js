@@ -57,7 +57,7 @@ router.get('/', async (req, res) => {
             return;
         }
 
-        console.log(user);
+        // console.log(user);
 
         res.status(200).send({
             status: true,
@@ -108,8 +108,8 @@ router.post('/daftar1', async (req, res) => {
 
             // check if data.no_telp is exists
             let isExist2 = await kurirModel.findOne({ no_telp: data.no_telp });
-            console.log(isExist2)
-            console.log("ini untuk no telpon")
+            // console.log(isExist2)
+            // console.log("ini untuk no telpon")
             if (isExist2) {
                 let message = (isExist2.status == 'Evaluasi') ? 'No Telpon ini telah terdaftar sebelumnya dan sekarang dalam evaluasi tim kami.\n Jika anda pemilik no telpon ini, Tim kami akan mengirim ke email yang anda daftarkan sebelumnya untuk konfirmasi pendaftaran' : 'No Telpon Sudah Terdaftar dan sudah diaktifkan';
                 res.status(400).send({
@@ -122,8 +122,8 @@ router.post('/daftar1', async (req, res) => {
 
             // check if data.email is exists
             let isExist3 = await kurirModel.findOne({ email: data.email });
-            console.log(isExist3)
-            console.log("ini untuk email")
+            // console.log(isExist3)
+            // console.log("ini untuk email")
             if (isExist3) {
                 let message = (isExist3.status == 'Evaluasi') ? 'Email ini telah terdaftar sebelumnya dan sekarang dalam evaluasi tim kami.\nTim kami akan mengirim ke email ini yang anda daftarkan sebelumnya untuk konfirmasi pendaftaran' : 'Email Sudah Terdaftar dan sudah diaktifkan';
                 res.status(400).send({
@@ -146,15 +146,15 @@ router.post('/daftar1', async (req, res) => {
 
             
             res.send({ status: true, message: 'Anda akan mendapat notifikasi di email anda dan juga no telpon jika admin menyetujui ataupun membatalkan pendaftaran anda' });
-            console.log(data)
+            // console.log(data)
             let new_kurir = new kurirModel(data);
             
             let new_login = new loginUserModel(data);
             new_login._idnya = new_kurir._id;
             await new_kurir.save();
             await new_login.save();
-            console.log(new_kurir)
-            console.log(new_login)
+            // console.log(new_kurir)
+            // console.log(new_login)
             
 
             // add photo_url to new_kurir            
@@ -247,13 +247,13 @@ router.post('/daftar1', async (req, res) => {
 
             new_pengirim.photo_url = `https://drive.google.com/uc?export=view&id=${await id_photo}`
 
-            console.log(new_pengirim)
+            // console.log(new_pengirim)
 
             let new_login = new loginUserModel(data);
 
             // push new_pengirim._id to new_login._idnya
             new_login._idnya = new_pengirim._id;
-            console.log(new_login);
+            // console.log(new_login);
 
             await new_pengirim.save();
             await new_login.save();

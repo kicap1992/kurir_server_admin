@@ -14,27 +14,55 @@ const pengirimanBarangSchema = new mongoose.Schema({
     required: true,
   },
   kordinat_pengiriman: {
-    lat :{
+    lat: {
       type: String,
       required: true,
     },
-    lng :{
+    lng: {
+      type: String,
+      required: true,
+    },
+    kelurahan_desa: {
+      type: String,
+      required: true,
+    },
+  },
+  kordinat_permulaan: {
+    lat: {
+      type: String,
+      required: true,
+    },
+    lng: {
       type: String,
       required: true,
     }
   },
-  kelurahan_desa: {
-    type: String,
-    required: true,
-  },
   foto_pengiriman: {
     type: String
+  },
+  status_pengiriman: {
+    type: String,
+    default: 'Dalam Pengesahan Kurir',
+  },
+  biaya : {
+    biaya_minimal: {
+      type: Number,
+      required: true,
+    },
+    biaya_maksimal: {
+      type: Number,
+      required: true,
+    },
+    biaya_per_kilo: {
+      type: Number,
+      required: true,
+    }
   },
   kurir: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'tb_kurir'
   },
-  pengirim : {
+  pengirim: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'tb_pengirim'
   },
@@ -49,6 +77,6 @@ const pengirimanBarangSchema = new mongoose.Schema({
 
 })
 
-const pengirimanBarangModel = mongoose.model('tb_pengiriman_barang', pengirimanBarangSchema , 'tb_pengiriman_barang');
+const pengirimanBarangModel = mongoose.model('tb_pengiriman_barang', pengirimanBarangSchema, 'tb_pengiriman_barang');
 
-module.exports = {pengirimanBarangModel};
+module.exports = { pengirimanBarangModel };
