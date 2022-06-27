@@ -44,7 +44,7 @@ const pengirimanBarangSchema = new mongoose.Schema({
     type: String,
     default: 'Dalam Pengesahan Kurir',
   },
-  biaya : {
+  biaya: {
     biaya_minimal: {
       type: Number,
       required: true,
@@ -66,6 +66,17 @@ const pengirimanBarangSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'tb_pengirim'
   },
+  history: [new mongoose.Schema({
+    waktu: {
+      type: Date,
+      default: Date.now,
+    },
+    status_pengiriman: {
+      type: String,
+    }
+  }, {
+    _id: false,
+  })],
   created_at: {
     type: Date,
     default: Date.now

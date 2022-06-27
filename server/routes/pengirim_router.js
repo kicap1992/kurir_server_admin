@@ -157,6 +157,9 @@ router.post('/pengiriman_barang', cek_user_pengirim, async (req, res) => {
     biaya: biaya,
     kurir: id_kurir,
     pengirim: id,
+    history:{
+      status_pengiriman : "Dalam Pengesahan Kurir"
+    }
   });
   console.log(data_created._id, "ini data pengiriman barang")
 
