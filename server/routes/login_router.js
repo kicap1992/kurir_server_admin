@@ -89,21 +89,23 @@ router.post('/daftar1', async (req, res) => {
             return;
         }
         data = JSON.parse(data);
+        console.log(data.role);
 
         if (data.role == 'kurir') {
-
+            // console.log("sini rolenya");
+            // return res.send({ status: true, message: 'berhasil daftar' });
             let isExist = await kurirModel.findOne({ nik: data.nik });
-            // console.log(isExist.status + "ini adalag evaluasi");
+            console.log(isExist + "ini adalag evaluasi");
             // console.log("ini untuk nik")
             if (isExist) {
                 let message = (isExist.status == 'Evaluasi') ? 'NIK telah terdaftar sebelumnya dan sekarang dalam evaluasi tim kami.\nTim kami akan mengirim ke email yang anda daftarkan sebelumnya untuk konfirmasi pendaftaran' : 'NIK Sudah Terdaftar dan sudah diaktifkan';
 
-                res.status(400).send({
+                return res.status(400).send({
                     status: false,
                     message: message,
                     focus: 'nik'
                 });
-                return;
+                
             }
 
             // check if data.no_telp is exists
@@ -204,9 +206,7 @@ router.post('/daftar1', async (req, res) => {
 
             // responsenya = new_kurir;
         } else if (data.role == 'pengirim') {
-            let isExist = await pengirimModel.findOne({ nik: data.no_telp });
-            // console.log(isExist.status + "ini adalag evaluasi");
-            // console.log("ini untuk no_telpon")
+            let isExist = await pengirimModel.findOne({ no_telp: data.no_telp });
             if (isExist) {
                 let message = (isExist.status == 'Evaluasi') ? 'No Telpon ini telah terdaftar sebelumnya dan sekarang dalam evaluasi tim kami.\n Jika anda pemilik no telpon ini, Tim kami akan mengirim ke email yang anda daftarkan sebelumnya untuk konfirmasi pendaftaran' : 'No Telpon Sudah Terdaftar dan sudah diaktifkan';
                 res.status(400).send({
@@ -239,11 +239,15 @@ router.post('/daftar1', async (req, res) => {
                 return;
             }
 
-            res.send({ status: true, message: 'Anda akan mendapat notifikasi di email anda dan juga no telpon jika admin menyetujui ataupun membatalkan pendaftaran anda' });
+            // console.log(req.files.photo);
+
+            res.status(200).send({ status: true, message: 'Anda akan mendapat notifikasi di email anda dan juga no telpon jika admin menyetujui ataupun membatalkan pendaftaran anda' });
 
             let new_pengirim = new pengirimModel(data);
+            console.log(new_pengirim)
             // add photo_url to new_pengirim
             let id_photo = googlenya.uploadFile(new_pengirim._id + ".jpg", req.files.photo.path, pengirim_folder_id, "ini photo pengirim");
+            console.log(id_photo, " ini id photo")
 
             new_pengirim.photo_url = `https://drive.google.com/uc?export=view&id=${await id_photo}`
 

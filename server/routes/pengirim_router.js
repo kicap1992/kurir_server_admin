@@ -224,7 +224,7 @@ router.get('/log_kiriman', async (req, res) => {
   }).select('-pengirim -__v').populate({
     path: 'kurir',
     select: '-email -created_at -updated_at -__v -ktp_url  -alamat  -pengiriman_barang -ktp_holding_url -nik',
-  })
+  }).sort({ updated_at: -1 }).exec();
   res.status(200).send({ data: data });
 })
 

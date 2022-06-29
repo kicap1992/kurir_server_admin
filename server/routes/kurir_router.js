@@ -102,9 +102,10 @@ router.get('/pengiriman_kurir_dalam_pengesahan', cek_user_kurir, async (req, res
       $or: [
         { status_pengiriman: 'Dalam Pengesahan Kurir' },
         { status_pengiriman: 'Disahkan Kurir' },
-        { status_pengiriman: 'Mengambil Paket Pengiriman Dari Pengirim' }
+        { status_pengiriman: 'Mengambil Paket Pengiriman Dari Pengirim' },
+        { status_pengiriman: 'Menghantar Paket Pengiriman Ke Penerima' },
       ]
-    }).select(' -kurir -__v ').sort({ status_pengiriman: -1 }).populate({
+    }).select(' -kurir -__v ').sort({ updated_at: -1 }).populate({
         path: 'pengirim',
         select: '-__v -created_at -updated_at -status'
 
@@ -116,6 +117,30 @@ router.get('/pengiriman_kurir_dalam_pengesahan', cek_user_kurir, async (req, res
 
 
 })
+
+// create '/pengiriman_completed' get route
+router.get('/pengiriman_completed', cek_user_kurir, async (req, res) => {
+  try {
+    console.log('masuk get pengiriman_completed');
+    const cek_data = await pengirimanBarangModel.find({
+      kurir: req.query.id,
+      // status = 'Dalam Pengesahan Kurir' or 'Disahkan Kurir'
+      $or: [
+        { status_pengiriman: 'Paket Diterima Oleh Penerima' },
+      ]
+    }).select(' -kurir -__v ').sort({ updated_at: -1 }).populate({
+        path: 'pengirim',
+        select: '-__v -created_at -updated_at -status'
+
+      });
+    res.status(200).send({ message: 'Data berhasil ditemukan', data: cek_data });
+  } catch (error) {
+    res.status(500).send({ message: 'Internal Server Error', data: null });
+  }
+
+
+})
+
 
 // create 'sahkan_pengiriman' post route
 router.post('/sahkan_pengiriman', cek_user_kurir, async (req, res) => {
