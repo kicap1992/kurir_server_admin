@@ -121,7 +121,7 @@ router.get('/pengiriman_kurir_dalam_pengesahan', cek_user_kurir, async (req, res
 // create '/pengiriman_completed' get route
 router.get('/pengiriman_completed', cek_user_kurir, async (req, res) => {
   try {
-    console.log('masuk get pengiriman_completed');
+    // console.log('masuk get pengiriman_completed');
     const cek_data = await pengirimanBarangModel.find({
       kurir: req.query.id,
       // status = 'Dalam Pengesahan Kurir' or 'Disahkan Kurir'
@@ -170,7 +170,7 @@ router.post('/sahkan_pengiriman', cek_user_kurir, async (req, res) => {
       }
       , { new: true }
     );
-    console.log(cek_pengiriman);
+    // console.log(cek_pengiriman);
 
     res.status(200).send({ message: 'Pengiriman berhasil disahkan', data: cek_pengiriman });
 
@@ -183,7 +183,7 @@ router.post('/sahkan_pengiriman', cek_user_kurir, async (req, res) => {
 
 // create '/pengirim' get route
 router.get('/pengirim', cek_user_kurir, async (req, res) => {
-  console.log('masuk get pengirim');
+  // console.log('masuk get pengirim');
   // get all pengirim
   const cek_data = await pengirimModel.find().select('-__v -created_at -updated_at');
   res.status(200).send({ message: 'Data berhasil ditemukan', data: cek_data });
@@ -240,7 +240,7 @@ router.post('/mengambil_paket_pengiriman', cek_user_kurir, async (req, res) => {
       }
       , { new: true }
     );
-    console.log(cek_pengiriman);
+    // console.log(cek_pengiriman);
 
     res.status(200).send({ message: 'Pengiriman berhasil disahkan', data: cek_pengiriman });
     } catch (error) {
@@ -248,6 +248,20 @@ router.post('/mengambil_paket_pengiriman', cek_user_kurir, async (req, res) => {
     }
 })
 
+
+// create 'profil' get route
+router.get('/profil_kurir', cek_user_kurir, async (req, res) => {
+  console.log("ini cek profilnya");
+  try {
+    const cek_data = await kurirModel.findOne({
+      _id: req.query.id
+    }).select('-__v -created_at -updated_at -pengaturan_pengiriman -pengiriman_barang');
+    res.status(200).send({ message: 'Data berhasil ditemukan', data: cek_data });
+  } catch (error) {
+    res.status(500).send({ message: 'Internal Server Error', data: null });
+  }
+  // res.status(200).send({ message: 'Data berhasil ditemukan'});
+})
 
 module.exports = router;
 
