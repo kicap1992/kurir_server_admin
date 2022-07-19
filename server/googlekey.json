@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "kurir-project-347217",
+  "private_key_id": "909837ad8b64d351de550354d0f9cfe5e876eff9",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCwWCh3QtfgTn5+\nNl9hviQ+E3aIPcCYqiaOSk16F304N4rC3xANrpNfqEKZvcciPpZmcMp+YC66jqvM\nJi4Zby4ZY44uhoQ34AqHzF0E1hmzTUtQcGqDTJ76jtcnQXYBg3aLXKm4fjyggxSa\nE0pEsiIpi8R7STHws8V8LJzBZFvAstuVa6FTnnCtYNVgMt7flwePG240wKKECKc5\nKyZ+iOvBsCRwSNv2WIblq9AQqfKZxKv7aW4049BNwNKnlcLxDuBqgUkP0y4CnAHw\ns79r6uj6JYvJ9jL1Fqv7DIAfwbd1z61PYgKj+zgUopb/svYnZA75CPp2R6RwpQYc\nVL6hf+KBAgMBAAECggEAAscqFgeLyo5kqud/ilTk5xnGjtVi32ojcto5TRB/KhT3\n6Y4lh4L7R9u+TC6OQJwZ9vGqbaIQF7jFJzwSaFdVHinFv4u3cVY6cZK22WtnsBMq\nOfwXYCD4yoDYY1eCPM+zHPVqqAvMYolGGGTwO9OkOvbRyNEUSWgvltSbazwslNpw\nbJqetnI4cLvWtgbQvHiLzOghZwMZXSLJ2Bl0y2SGc4yjbrV+2Ll4Zq8oAiv2RWa8\nDe7lNu1KSPkAlLJGvYiApXcgZvJQR48LH9W8spYAAkdIf1LSROcGCCmpLnrCu0kK\nkkUk9p7F7ozCvaAzYlIzjQ4MyUihUP9t11jD0UISEQKBgQDd2w6kVFmO4FeK/w1h\nkZDlPIYIIuoLhZMIbXEC7DaGNbc+gIOtuQPgVD2h8QbUsJiZn6OQhebex3d5rTxg\ngJqThvdRgh0j8LArRcS11CTyd9hW9uIGrfWDIgbYNoCsco+r9Zto86V+aSRL1Hcv\nACtpyRcjDqHERat5KCUjyRZXyQKBgQDLe/1nMOtaxr9UNRXYEgztVRnbkXnslf0I\ned3Ul4MD5K3VDRF6JN6BykLszr82c527XWrzhxClK3YSHWjA0LouWyzEJTQiRyco\nyz6Vd3KqYKvxKpzr8DAIa/67HTIc6qJWSHfgZUnUs0btEyeGeJf00qUIhZwuKVfw\nphfNF+CA+QKBgA3dowyiOPa1DsOhLTTr5CJvpfDcPcR6lLXyIR4NpVq+ALXnUlOJ\nPLTIjxGP/t1MLD1tvMtLkyJZVR5FtYBSiVavGMX/W9LjOB98PM8gcy60TtEgnP/N\n34pSlhrtTR16C4Cz2QK2N6Gu8JXMsaY+XHhAGTIXuASMVis8VxXle4ABAoGBALrx\n1ONjLDcf9VO12bXDD6FT2AfDZZKYUfnhjI3uDO4cwB/Ge9IN4Wa4njfV0hKCsd0b\nfFD0O7Sjczw9TKoomYRRO5WQ4I7FdBKkd4D2VqB1ZEKS9cxFxLtYDJV3wzyRzEcd\nGRVNuUDy3Cyetmdyj5jblcd4iP5X+XUcAy3ny9hxAoGANlqXYq9wk7vsmlqu5Pz7\nBbupKGNhVwtmQAm3RDudtzbP/qi8awI3g22j4x05UHXnmIVPIEGbjajBIad5PH0s\nI7G2H/Gx91rDN4ym3e3zTVpNyHu8usMo+TVPGsPYrxAjlSo+7HUc/VacOMQvSgXw\nrHEYekIt1HEDgbyWEV23cqI=\n-----END PRIVATE KEY-----\n",
+  "client_email": "googledrive@kurir-project-347217.iam.gserviceaccount.com",
+  "client_id": "115368903585615403523",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/googledrive%40kurir-project-347217.iam.gserviceaccount.com"
+}

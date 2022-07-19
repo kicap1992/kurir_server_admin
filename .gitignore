@@ -33,8 +33,8 @@ yarn-error.log*
 .vercel
 
 # googlekey.json
-googlekey.json*
+# googlekey.json*
 
 # cert
-cert.crt
-cert.key
+# cert.crt
+# cert.key

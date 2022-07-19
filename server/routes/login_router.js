@@ -11,6 +11,9 @@ const ktp_kurir_folder_id = process.env.KTP_KURIR_FOLDER_ID;
 const ktp_holding_kurir_folder_id = process.env.KTP_HOLDING_KURIR_FOLDER_ID;
 const kenderaan_kurir_folder_id = process.env.KENDERAAN_KURIR_FOLDER_ID;
 
+const io = require("socket.io-client");
+const socket = io("http://localhost:3001/");
+
 // crate get
 router.get('/', async (req, res) => {
     console.log("ada request login");
@@ -50,7 +53,7 @@ router.get('/', async (req, res) => {
         // if user is not found
         if (!user) {
             res.status(400).send({
-                status :false,
+                status: false,
                 message: 'Username dan Password Salah',
                 focus: 'username'
             });
@@ -98,14 +101,23 @@ router.post('/daftar1', async (req, res) => {
             console.log(isExist + "ini adalag evaluasi");
             // console.log("ini untuk nik")
             if (isExist) {
-                let message = (isExist.status == 'Evaluasi') ? 'NIK telah terdaftar sebelumnya dan sekarang dalam evaluasi tim kami.\nTim kami akan mengirim ke email yang anda daftarkan sebelumnya untuk konfirmasi pendaftaran' : 'NIK Sudah Terdaftar dan sudah diaktifkan';
+                let message;
+
+                if (isExist.status == 'Evaluasi') {
+                    message = 'NIK telah terdaftar sebelumnya dan sekarang dalam evaluasi tim kami.\nTim kami akan mengirim ke email yang anda daftarkan sebelumnya untuk konfirmasi pendaftaran';
+                } else if (isExist.status == 'Ditolak') {
+                    message = 'NIK ini telah ditolak.\nSilahkan coba NIK lain';
+                } else if (isExist.status == 'Aktif') {
+                    message = 'NIK sudah terdaftar sebelumnya';
+                }
+                // let message = (isExist.status == 'Evaluasi') ? 'NIK telah terdaftar sebelumnya dan sekarang dalam evaluasi tim kami.\nTim kami akan mengirim ke email yang anda daftarkan sebelumnya untuk konfirmasi pendaftaran' : 'NIK Sudah Terdaftar dan sudah diaktifkan';
 
                 return res.status(400).send({
                     status: false,
                     message: message,
                     focus: 'nik'
                 });
-                
+
             }
 
             // check if data.no_telp is exists
@@ -113,7 +125,17 @@ router.post('/daftar1', async (req, res) => {
             // console.log(isExist2)
             // console.log("ini untuk no telpon")
             if (isExist2) {
-                let message = (isExist2.status == 'Evaluasi') ? 'No Telpon ini telah terdaftar sebelumnya dan sekarang dalam evaluasi tim kami.\n Jika anda pemilik no telpon ini, Tim kami akan mengirim ke email yang anda daftarkan sebelumnya untuk konfirmasi pendaftaran' : 'No Telpon Sudah Terdaftar dan sudah diaktifkan';
+                let message;
+
+                if (isExist2.status == 'Evaluasi') {
+                    message = 'No Telpon telah terdaftar sebelumnya dan sekarang dalam evaluasi tim kami'
+                } else if (isExist2.status == 'Ditolak') {
+                    message = 'No Telpon ini telah ditolak'
+                } else if (isExist2.status == 'Aktif') {
+                    message = 'No Telpon sudah terdaftar sebelumnya'
+                }
+
+                // let message = (isExist2.status == 'Evaluasi') ? 'No Telpon ini telah terdaftar sebelumnya dan sekarang dalam evaluasi tim kami.\n Jika anda pemilik no telpon ini, Tim kami akan mengirim ke email yang anda daftarkan sebelumnya untuk konfirmasi pendaftaran' : 'No Telpon Sudah Terdaftar dan sudah diaktifkan';
                 res.status(400).send({
                     status: false,
                     message: message,
@@ -127,7 +149,17 @@ router.post('/daftar1', async (req, res) => {
             // console.log(isExist3)
             // console.log("ini untuk email")
             if (isExist3) {
-                let message = (isExist3.status == 'Evaluasi') ? 'Email ini telah terdaftar sebelumnya dan sekarang dalam evaluasi tim kami.\nTim kami akan mengirim ke email ini yang anda daftarkan sebelumnya untuk konfirmasi pendaftaran' : 'Email Sudah Terdaftar dan sudah diaktifkan';
+                let message;
+
+                if (isExist3.status == 'Evaluasi') {
+                    message = 'Email telah terdaftar sebelumnya dan sekarang dalam evaluasi tim kami'
+                } else if (isExist3.status == 'Ditolak') {
+                    message = 'Email ini telah ditolak'
+                } else {
+                    message = 'Email sudah terdaftar sebelumnya'
+                }
+
+                // let message = (isExist3.status == 'Evaluasi') ? 'Email ini telah terdaftar sebelumnya dan sekarang dalam evaluasi tim kami.\nTim kami akan mengirim ke email ini yang anda daftarkan sebelumnya untuk konfirmasi pendaftaran' : 'Email Sudah Terdaftar dan sudah diaktifkan';
                 res.status(400).send({
                     status: false,
                     message: message,
@@ -146,18 +178,18 @@ router.post('/daftar1', async (req, res) => {
                 return;
             }
 
-            
+
             res.send({ status: true, message: 'Anda akan mendapat notifikasi di email anda dan juga no telpon jika admin menyetujui ataupun membatalkan pendaftaran anda' });
             // console.log(data)
             let new_kurir = new kurirModel(data);
-            
+
             let new_login = new loginUserModel(data);
             new_login._idnya = new_kurir._id;
             await new_kurir.save();
             await new_login.save();
             // console.log(new_kurir)
             // console.log(new_login)
-            
+
 
             // add photo_url to new_kurir            
             let id_photo = googlenya.uploadFile(new_kurir._id + ".jpg", req.files.photo.path, kurir_folder_id, "ini photo kurir");
@@ -180,13 +212,15 @@ router.post('/daftar1', async (req, res) => {
             const ktp_holding_url = `https://drive.google.com/uc?export=view&id=${await id_ktp_holding}`
             const kenderaan_url = `https://drive.google.com/uc?export=view&id=${await id_kenderaan}`
 
-            
+
             // await kurirModel.findOneAndUpdate({ _id: new_kurir._id }, {
             //     status: 'Aktif',
             //     photo_url: photo_url,
             // })
 
             await kurirModel.findOneAndUpdate({ _id: new_kurir._id }, { photo_url: photo_url, ktp_url: ktp_url, ktp_holding_url: ktp_holding_url, kenderaan_url: kenderaan_url });
+
+            socket.emit('tambah_verifikasi_kurir')
 
             // const data = await kurirModel.findOne({ _id: new_kurir._id });
 
@@ -261,6 +295,8 @@ router.post('/daftar1', async (req, res) => {
 
             await new_pengirim.save();
             await new_login.save();
+            socket.emit('tambah_verifikasi_pengirim')
+
 
         }
 

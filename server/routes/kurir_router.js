@@ -13,6 +13,9 @@ const ktp_kurir_folder_id = process.env.KTP_KURIR_FOLDER_ID;
 const ktp_holding_kurir_folder_id = process.env.KTP_HOLDING_KURIR_FOLDER_ID;
 const kenderaan_kurir_folder_id = process.env.KENDERAAN_KURIR_FOLDER_ID;
 
+const io = require("socket.io-client");
+const socket = io("http://localhost:3001/");
+
 async function cek_user_kurir(req, res, next) {
   if (req.query.username == null && req.query.password == null && req.query.id == null) return res.status(401).send({ message: 'Not Authorized' });
   const cek_login = await loginUserModel.findOne({
@@ -106,10 +109,10 @@ router.get('/pengiriman_kurir_dalam_pengesahan', cek_user_kurir, async (req, res
         { status_pengiriman: 'Menghantar Paket Pengiriman Ke Penerima' },
       ]
     }).select(' -kurir -__v ').sort({ updated_at: -1 }).populate({
-        path: 'pengirim',
-        select: '-__v -created_at -updated_at -status'
+      path: 'pengirim',
+      select: '-__v -created_at -updated_at -status'
 
-      });
+    });
     res.status(200).send({ message: 'Data berhasil ditemukan', data: cek_data });
   } catch (error) {
     res.status(500).send({ message: 'Internal Server Error', data: null });
@@ -129,10 +132,10 @@ router.get('/pengiriman_completed', cek_user_kurir, async (req, res) => {
         { status_pengiriman: 'Paket Diterima Oleh Penerima' },
       ]
     }).select(' -kurir -__v ').sort({ updated_at: -1 }).populate({
-        path: 'pengirim',
-        select: '-__v -created_at -updated_at -status'
+      path: 'pengirim',
+      select: '-__v -created_at -updated_at -status'
 
-      });
+    });
     res.status(200).send({ message: 'Data berhasil ditemukan', data: cek_data });
   } catch (error) {
     res.status(500).send({ message: 'Internal Server Error', data: null });
@@ -192,10 +195,10 @@ router.get('/pengirim', cek_user_kurir, async (req, res) => {
 
 // create '/detail_pengiriman' get route
 router.get('/detail_pengiriman', cek_user_kurir, async (req, res) => {
-  try{
+  try {
     id_pengiriman = req.query.id_pengiriman;
     // console.log('masuk get detail_pengiriman');
-    
+
     const cek_data = await pengirimanBarangModel.findOne({
       _id: id_pengiriman,
       kurir: req.query.id
@@ -243,9 +246,94 @@ router.post('/mengambil_paket_pengiriman', cek_user_kurir, async (req, res) => {
     // console.log(cek_pengiriman);
 
     res.status(200).send({ message: 'Pengiriman berhasil disahkan', data: cek_pengiriman });
-    } catch (error) {
-      res.status(500).send({ message: 'Internal Server Error', data: null });
+  } catch (error) {
+    res.status(500).send({ message: 'Internal Server Error', data: null });
+  }
+})
+
+
+// create 'konfirmasi_terima_paket_pengirim' post route
+router.post('/konfirmasi_terima_paket_pengirim', cek_user_kurir, async (req, res) => {
+  try {
+    const id_pengiriman = req.body.id_pengiriman;
+    const cek_data = await pengirimanBarangModel.findOne({
+      _id: id_pengiriman,
+      kurir: req.query.id
+    });
+
+    if (!cek_data) return res.status(400).send({ message: 'Data tidak ditemukan', data: null });
+
+    const cek_pengiriman = await pengirimanBarangModel.findOneAndUpdate({
+      _id: id_pengiriman,
+      kurir: req.query.id
     }
+      , {
+        status_pengiriman: 'Menghantar Paket Pengiriman Ke Penerima',
+        // push to history
+        $push: {
+          history: {
+            status_pengiriman: 'Menghantar Paket Pengiriman Ke Penerima',
+          }
+        },
+
+        updated_at: new Date()
+      }
+      , { new: true }
+    );
+    // console.log(cek_pengiriman);
+
+    socket.emit('info_detail_paket', {
+      // id_pengirim: '62be1a1a97c4a38caea7a5d8',
+      id_pengiriman: id_pengiriman,
+    }) 
+
+    res.status(200).send({ message: 'Paket pengiriman berhasil diterima dari pengirim\nMenghantar paket ke penerima', data: cek_pengiriman });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({ message: 'Internal Server Error', data: null });
+  }
+})
+
+
+// create 'konfirmasi_terima_paket_penerima' post route
+// router.post('/konfirmasi_terima_paket_penerima', cek_user_kurir, async (req, res) => {
+router.post('/konfirmasi_terima_paket_penerima', async (req, res) => {
+  try {
+    const id_pengiriman = req.body.id_pengiriman;
+    const cek_data = await pengirimanBarangModel.findOne({
+      _id: id_pengiriman,
+      kurir: req.query.id
+    });
+
+    if (!cek_data) return res.status(400).send({ message: 'Data tidak ditemukan', data: null });
+
+    const cek_pengiriman = await pengirimanBarangModel.findOneAndUpdate({
+      _id: id_pengiriman,
+      kurir: req.query.id
+    }
+      , {
+        status_pengiriman: 'Paket Diterima Oleh Penerima',
+        // push to history
+        $push: {
+          history: {
+            status_pengiriman: 'Paket Diterima Oleh Penerima',
+          }
+        },
+
+        updated_at: new Date()
+      }
+      , { new: true }
+    );
+    // console.log(cek_pengiriman);
+    socket.emit('info_detail_paket', {
+      // id_pengirim: '62be1a1a97c4a38caea7a5d8',
+      id_pengiriman: id_pengiriman,
+    }) 
+
+    res.status(200).send({ message: 'Paket pengiriman berhasil diterima oleh Penerima', data: cek_pengiriman });
+  } catch (error) {
+    res.status(500).send({ message: 'Internal Server Error', data: null });
+  }
 })
 
 
