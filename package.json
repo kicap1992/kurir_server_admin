@@ -2,11 +2,14 @@
   "name": "kurir_server",
   "version": "0.1.0",
   "private": true,
-  "main": "index.js",
+  "main": "server/index.js",
+  "engines": {
+    "node": "17.x"
+  },
   "scripts": {
     "dev": "nodemon server/index.js",
     "build": "next build",
-    "start": "next start",
+    "start": "node server/index.js",
     "lint": "next lint"
   },
   "dependencies": {
